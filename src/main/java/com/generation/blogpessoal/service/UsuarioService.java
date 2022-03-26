@@ -57,6 +57,8 @@ public class UsuarioService {
 		if (usuarioRepository.findByUsuario(usuario.getUsuario()).isPresent())
 			return Optional.empty();
 		
+		if (usuario.getFoto() == null)
+			usuario.setFoto("https://i.imgur.com/Zz4rzVR.png");
 		/**
 		 * Se o Usuário não existir no Banco de Dados, a senha será criptografada
 		 * através do Método criptografarSenha.
