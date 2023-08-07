@@ -72,6 +72,26 @@ namespace blogpessoal
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddTransient<IAuthService, AuthService>();
 
+            // Adicionar a Validação do Token JWT
+
+            builder.Services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(o =>
+            {
+                var Key = Encoding.UTF8.GetBytes(Settings.Secret);
+                o.SaveToken = true;
+                o.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Key),
+                };
+            });
+
             // Learn more about configuring Swagger/OpenAPI
             // at https://aka.ms/aspnetcore/swashbuckle
 
@@ -119,33 +139,12 @@ namespace blogpessoal
             // Adicionar o Fluent Validation no Swagger
             builder.Services.AddFluentValidationRulesToSwagger();
 
-            // Adicionar a Validação do Token JWT
-
-            builder.Services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(o =>
-            {
-                var Key = Encoding.UTF8.GetBytes(Settings.Secret);
-                o.SaveToken = true;
-                o.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Key),
-                };
-            });
-
             // Configuração do CORS
             builder.Services.AddCors(options => {
-                options.AddPolicy(name: "MyPolicy",
-                    policy =>
+                options.AddDefaultPolicy(policy =>
                     {
-                        policy.AllowAnyOrigin()
-                        .AllowAnyHeader()
+                        policy.AllowAnyHeader()
+                        .AllowAnyOrigin()
                         .AllowAnyMethod();
                     });
             });
@@ -179,10 +178,10 @@ namespace blogpessoal
 
             //Habilitar CORS
 
-            app.UseCors("MyPolicy");
+            app.UseCors();
 
              app.UseHttpsRedirection();
-             
+
             // Habilitar a Autenticação e a Autorização
 
             app.UseAuthentication();
