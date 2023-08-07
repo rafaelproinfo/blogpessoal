@@ -139,12 +139,14 @@ namespace blogpessoal
             // Adicionar o Fluent Validation no Swagger
             builder.Services.AddFluentValidationRulesToSwagger();
 
+
             // Configuração do CORS
             builder.Services.AddCors(options => {
-                options.AddDefaultPolicy(policy =>
+                options.AddPolicy(name: "MyPolicy",
+                    policy =>
                     {
-                        policy.AllowAnyHeader()
-                        .AllowAnyOrigin()
+                        policy.AllowAnyOrigin()
+                        .AllowAnyHeader()
                         .AllowAnyMethod();
                     });
             });
@@ -178,9 +180,7 @@ namespace blogpessoal
 
             //Habilitar CORS
 
-            app.UseCors();
-
-             app.UseHttpsRedirection();
+            app.UseCors("MyPolicy");
 
             // Habilitar a Autenticação e a Autorização
 
